@@ -1,9 +1,24 @@
-function [H, T, R] = myhough(BW)
+function [H, T, R] = myhough(BW, varargin)
   % compute Standard Hough Transform for the given input
-
   %% input parameters
-  RhoResolution = 1;
-  T = -90:1:89;
+  % BW: a black & white image containing pixels with values 0 & 1
+  
+  %% Name-value pair arguments
+  % 'RhoResolution' - spacing of Hough transform buckets along the rho
+  % axis.  Default 1.
+  % 'Theta' - Theta values in degrees for the corresponding column of the
+  % output matrix H.  Default -90:1:89
+
+  %% input name-value pair parameter parsing
+  p = inputParser;
+  addRequired(p, 'BW');
+  addParameter(p, 'RhoResolution', 1, @(x) isnumeric(x) && (x > 0) && (x < norm(size(BW))));
+  addParameter(p, 'Theta', -90:1:89, @isnumeric);
+  
+  parse(p, BW, varargin{:});
+  
+  T = p.Results.Theta;
+  RhoResolution = p.Results.RhoResolution;
   
   %% compute the thetas that will be used to generate rho for every non-zero pixel in the image
   thetasRad = T * pi / 180;
