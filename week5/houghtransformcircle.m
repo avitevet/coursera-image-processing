@@ -1,4 +1,4 @@
-function [H, C, R] = hough-transform-circle(BW, varargin)
+function [H, C, R] = houghtransformcircle(BW, varargin)
   % compute Standard Hough Transform for circles for the given input
   %% input parameters
   % BW: a black & white image containing pixels with values 0 & 1
@@ -38,31 +38,36 @@ function [H, C, R] = hough-transform-circle(BW, varargin)
   rSqs = p.Results.Radius .* p.Results.Radius;
   
   % for every center, and for every point "near" that center, and for every radius, vote 1
-  % if (x - X0)^2 + (y - Y0)^2 == r^2
+  % if (x - X0)^2 + (y - Y0)^2 ~== r^2
   for y = Ys
-      for x = Xs
-        for rSq = rSqs
-            % bounds checking
-            upperLeftX = floor(x - r);
-            upperLeftY = floor(y - r);
-            lowerRightX = ceil(x + r);
-            lowerRightY = ceil(y + r);
-            
-            if (upperLeftY < 1) or (lowerRightY > height) or (upperLeftX < 1) or (lowerRightX > width)
-                continue
-            end
-            
-            % examine the points in the region surrounding the center
-            yindices = upperLeftY:lowerRightY;
-            xindices = upperLeftX:lowerRightX;
-            
-            ydiffs = yindices - y;
-            xdiffs = xindices - x;
-            
-            ydiffsSq = ydiffs .* ydiffs;
-            xdiffsSq = xdiffs .* xdiffs;
-            
-            if (
-            
+    for x = Xs
+      for rSq = rSqs
+        % bounds checking
+        upperLeftX = floor(x - rSq);
+        upperLeftY = floor(y - rSq);
+        lowerRightX = ceil(x + rSq);
+        lowerRightY = ceil(y + rSq);
+        
+        if (upperLeftY < 1) || (lowerRightY > height) || (upperLeftX < 1) || (lowerRightX > width)
+            break
+        end
+        
+        % examine the points in the region surrounding the center
+        yindices = upperLeftY:lowerRightY;
+        xindices = upperLeftX:lowerRightX;
+        
+        ydiffs = yindices - y;
+        xdiffs = xindices - x;
+        
+        diffs = [ydiffs; xdiffs];
+        
+        matchingPoints = diffs * diffs' - rSq;
+        
+        ydiffsSq = ydiffs .* ydiffs;
+        xdiffsSq = xdiffs .* xdiffs;
+      end
+    end       
+  end            
+         
           
 end
